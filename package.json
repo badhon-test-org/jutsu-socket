@@ -1,17 +1,34 @@
 {
-  "name": "nearpad-socket",
+  "name": "poket-dokan-api",
   "version": "1.0.0",
-  "description": "nearpad platform's socket.",
-  "main": "index.js",
-  "author": "Saidul Badhon",
-  "license": "MIT",
-  "dependencies": {
-    "express": "^4.18.2",
-    "http": "0.0.1-security",
-    "socket.io": "^4.6.1",
-    "cors": "^2.8.5"
-  },
+  "description": "poket-dokan Platform Backend API",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "poket-dokan"
+  ],
+  "author": "Saidul Badhon",
+  "license": "Unlicense",
+  "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
+    "axios": "^0.27.2",
+    "bcryptjs-then": "^1.0.1",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-rate-limit": "^6.7.0",
+    "helmet": "^4.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.12",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.22",
+    "serverless-http": "^2.7.0",
+    "serverless-websockets-plugin": "^1.0.0",
+    "socket.io": "^4.6.1",
+    "validator": "^13.6.0"
   }
 }

@@ -1,0 +1,30 @@
+service: nearpad-soket-2
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  websocketsApiName: nearpad-soket-2-api
+  websocketsApiRouteSelectionExpression: $request.body.action
+  websocketsDescription: nearpad-soket-2-api
+  stage: ${opt:stage, 'production'}
+  region: us-east-1
+  timeout: 300
+  memorySize: 2048
+
+plugins:
+  - serverless-websockets-plugin
+
+functions:
+  socketServer:
+    handler: server.handler
+    events:
+      - websocket:
+        route: $connect
+      - websocket:
+        route: $disconnect
+      - websocket:
+        route: $joinChannel
+      - websocket:
+        route: $leaveChannel
+      - websocket:
+        route: $code

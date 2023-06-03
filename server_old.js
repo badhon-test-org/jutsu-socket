@@ -1,20 +1,15 @@
-// Import necessary modules
+const serverless = require("serverless-http");
+
 const express = require("express");
-const http = require("http");
-// const socketIO = require("socket.io");
-const io = require("socket.io")(3001, {
+const app = express();
+const server = require("http").createServer(app);
+const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     credentials: true,
     methods: ["GET", "POST"],
   },
 });
-const cors = require("cors");
-
-const app = express(); // Create an express app
-app.use(cors());
-
-const server = http.createServer(app); // Create an http server using the express app
 
 var colors = [
   "#E53935",
@@ -40,7 +35,10 @@ var colors = [
 const users = new Map(); // Map to store users with socket IDs as keys
 const channels = new Map(); // Map to store channels with connected users as values
 
-// Listen for socket connection event
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
+});
+
 io.on("connection", (socket) => {
   console.log("A user connected");
 
@@ -57,7 +55,11 @@ io.on("connection", (socket) => {
         channels.set(channel, channelUsers);
         // Emit updated member list to all clients in the channel
         io.to(channel).emit("memberList", Array.from(channelUsers.values()));
-        console.log(`User ${user.fullName} left channel ${channel}`);
+        console.log(`User ${user.name} left channel ${channel}`);
+
+        if (channelUsers?.size === 0) {
+          console.log("Channel is empty: ", channelUsers, channels);
+        }
       }
     }
     console.log("A user disconnected");
@@ -78,7 +80,7 @@ io.on("connection", (socket) => {
     channels.set(channel, channelUsers);
     // Emit updated member list to all clients in the channel
     io.to(channel).emit("memberList", Array.from(channelUsers.values()));
-    console.log(`User ${user.fullName} joined channel "${channel}"`);
+    console.log(`User ${user.name} joined channel "${channel}"`);
   });
 
   // Socket.IO event for leaving a channel
@@ -91,21 +93,22 @@ io.on("connection", (socket) => {
       channels.set(channel, channelUsers);
       // Emit updated member list to all clients in the channel
       io.to(channel).emit("memberList", Array.from(channelUsers.values()));
-      console.log(`User ${user.fullName} left channel ${channel}`);
+      console.log(`User ${user.name} left channel ${channel}`);
     }
   });
 
   // Socket.IO event for sending codes
   socket.on("code", (channel, code) => {
     io.to(channel).emit("code", socket.user, code); // Emit the 'newCode' event to all clients in the channel along with the user object
+
     console.log(
-      `User ${socket.user.fullName} sent a code in channel ${channel}: ${code}`
+      `User ${socket?.user?.name} sent a code in channel ${channel}: ${code}`
     );
   });
 });
 
-// Start the server
-const port = 3002; // You can choose any port number you prefer
-server.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+server.listen(process.env.PORT || 8001, () => {
+  console.log("listening on *:3000");
 });
+
+module.exports.handler = serverless(app);
